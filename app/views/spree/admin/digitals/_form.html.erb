@@ -1,15 +1,15 @@
 <div>
   <%= form_for(:digital, :url => admin_product_digitals_path(@product), :method => :create, :multipart => true ) do |f| %>
     <fieldset>
-      <legend class="h4 pl-0">Add Items</legend>
+      <legend class="h4 pl-0">Add Video</legend>
       <% if variant.digital? %>
         <table class="table">
           <thead>
-            <tr>
-              <th><%= Spree.t(:file_name, scope: "spree_digital") %></th>
-              <th>Item</th>
-              <th class="actions"></th>
-            </tr>
+          <tr>
+            <th><%= Spree.t(:file_name, scope: "spree_digital") %></th>
+            <th>Item</th>
+            <th class="actions"></th>
+          </tr>
           </thead>
           <tbody>
           <% variant.digitals.each do |digital| %>
@@ -27,10 +27,74 @@
 
       <div class="form-group">
         <%= f.label :file, Spree.t(:add_new_file, scope: 'digitals') %> <span class="required">*</span><br/>
-        <%= f.file_field :attachment %>
+        <%= f.file_field :attachment, accept: "video/*" %>
+        <%# if @product&.activity&.name&.downcase == "short video" %>
+
+        <%# elsif @product.activity.name.downcase == "shout out"%>
+        <%#= f.file_field :attachment, accept: "image/png, image/jpeg, image/jpg" %>
+        <%# end %>
         <%= hidden_field_tag 'digital[variant_id]', variant.id %>
-        <%= button Spree.t(:upload, scope: "spree_digital"), 'add', 'submit', { :class => "btn btn-primary" } %>
+        <%= button Spree.t(:upload, scope: "spree_digital"), 'add', 'submit', { :class => "btn btn-primary", id: 'btn_video_upload' } %>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Error!</strong> <span id="video_error_message"></span>
+      </div>
+      <div class="alert alert-info">
+        <strong>Info!</strong> <span id="video_duration_message"></span>
       </div>
     </fieldset>
   <% end %>
 </div>
+<script>
+  $('.alert-danger').hide();
+  $('.alert-info').hide();
+  $('#btn_video_upload').hide();
+    var myVideos = [];
+
+    window.URL = window.URL || window.webkitURL;
+
+    document.getElementById('digital_attachment').onchange = setFileInfo;
+
+    function setFileInfo() {
+        var ext = $(this).val().split('.').pop().toLowerCase();
+        if($.inArray(ext, ['mp4', 'mp3', 'wav', 'mpg', 'wmv', 'avi']) == -1) {
+            $('#video_error_message').text('Invalid video format, accept only mp4, mp3, wav, mpg, wmv, avi')
+            $('.alert-danger').show();
+            $("#digital_attachment").val("");
+            return false;
+        }
+        var files = this.files;
+        myVideos.push(files[0]);
+        var video = document.createElement('video');
+        video.preload = 'metadata';
+
+        video.onloadedmetadata = function() {
+            window.URL.revokeObjectURL(video.src);
+            var duration = video.duration;
+            myVideos[myVideos.length - 1].duration = duration;
+            videoDuration();
+            updateInfos();
+        }
+
+        video.src = URL.createObjectURL(files[0]);;
+    }
+
+    function videoDuration() {
+        let durationIdex = myVideos.length - 1
+        if (myVideos[durationIdex]["duration"] > 10){
+            $('.alert-danger').show();
+            $('#btn_video_upload').hide();
+            $('#video_error_message').html('please upload less then 10 second video');
+        }else{
+            $('#btn_video_upload').show();
+            $('.alert-danger').hide();
+        }
+    }
+
+    function updateInfos() {
+        $('.alert-info').show();
+        for (var i = 0; i < myVideos.length; i++) {
+            $('#video_duration_message').html(myVideos[i].name + " duration: " + myVideos[i].duration + '\n');
+        }
+    }
+</script>
