@@ -10,7 +10,34 @@ module Spree
         @object.attributes = add_additional_paramas if params[:digital][:attachment]
 
         if @object.valid?
-          super
+          invoke_callbacks(:create, :before)
+          @object.attributes = permitted_resource_params
+          if @object.save
+            invoke_callbacks(:create, :after)
+            video_duration = ActiveStorage::Analyzer::VideoAnalyzer.new(@object.attachment.blob).metadata[:duration].to_i
+            if(video_duration < 10)
+              unless @object.variant.product.taxons.present? && @object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
+                attach_short_video = Spree::Taxon.find_by(permalink: 'quickshout')
+                @object.variant.product.taxons << attach_short_video
+              end
+            else
+              unless @object.variant.product.taxons.present? && @object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
+                attach_short_video = Spree::Taxon.find_by(permalink: 'shoutout')
+                @object.variant.product.taxons << attach_short_video
+              end
+            end
+            flash[:success] = flash_message_for(@object, :successfully_created)
+            respond_with(@object) do |format|
+              format.html { redirect_to location_after_save }
+              format.js   { render layout: false }
+            end
+          else
+            invoke_callbacks(:create, :fails)
+            respond_with(@object) do |format|
+              format.html { render action: :new }
+              format.js { render layout: false }
+            end
+          end
         else
           invoke_callbacks(:create, :fails)
           flash[:error] = @object.errors.full_messages.join(", ")

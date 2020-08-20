@@ -36,8 +36,8 @@
         <%= hidden_field_tag 'digital[variant_id]', variant.id %>
         <%= button Spree.t(:upload, scope: "spree_digital"), 'add', 'submit', { :class => "btn btn-primary", id: 'btn_video_upload' } %>
       </div>
-      <div class="alert alert-danger">
-        <strong>Error!</strong> <span id="video_error_message"></span>
+      <div class="alert alert-success">
+        <strong>Info!</strong> <span id="video_info_message"></span>
       </div>
       <div class="alert alert-info">
         <strong>Info!</strong> <span id="video_duration_message"></span>
@@ -46,7 +46,7 @@
   <% end %>
 </div>
 <script>
-  $('.alert-danger').hide();
+  $('.alert-success').hide();
   $('.alert-info').hide();
   $('#btn_video_upload').hide();
     var myVideos = [];
@@ -58,8 +58,8 @@
     function setFileInfo() {
         var ext = $(this).val().split('.').pop().toLowerCase();
         if($.inArray(ext, ['mp4', 'mp3', 'wav', 'mpg', 'wmv', 'avi']) == -1) {
-            $('#video_error_message').text('Invalid video format, accept only mp4, mp3, wav, mpg, wmv, avi')
-            $('.alert-danger').show();
+            $('#video_info_message').text('Invalid video format, accept only mp4, mp3, wav, mpg, wmv, avi')
+            $('.alert-success').show();
             $("#digital_attachment").val("");
             return false;
         }
@@ -81,20 +81,22 @@
 
     function videoDuration() {
         let durationIdex = myVideos.length - 1
-        if (myVideos[durationIdex]["duration"] > 10){
-            $('.alert-danger').show();
-            $('#btn_video_upload').hide();
-            $('#video_error_message').html('please upload less then 10 second video');
-        }else{
+        if (parseInt(myVideos[durationIdex]["duration"]) > 10){
+            $('.alert-success').show();
             $('#btn_video_upload').show();
-            $('.alert-danger').hide();
+            $('#video_info_message').html('your video is added into the Shout Out activity');
+        }else{
+            $('#video_info_message').html('your video is added into the Quick Shout activity');
+            $('#btn_video_upload').show();
+            $('.alert-success').hide();
         }
     }
 
     function updateInfos() {
         $('.alert-info').show();
+        $('.alert-success').show();
         for (var i = 0; i < myVideos.length; i++) {
-            $('#video_duration_message').html(myVideos[i].name + " duration: " + myVideos[i].duration + '\n');
+            $('#video_duration_message').html(myVideos[i].name + " duration: " + parseInt(myVideos[i].duration) + ' sec'+ '\n');
         }
     }
 </script>
