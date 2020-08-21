@@ -16,12 +16,12 @@ module Spree
             invoke_callbacks(:create, :after)
             video_duration = ActiveStorage::Analyzer::VideoAnalyzer.new(@object.attachment.blob).metadata[:duration].to_i
             if(video_duration < 10)
-              unless @object.variant.product.taxons.present? && @object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
+              if !@object.variant.product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
                 attach_short_video = Spree::Taxon.find_by(permalink: 'quickshout')
                 @object.variant.product.taxons << attach_short_video
               end
             else
-              unless @object.variant.product.taxons.present? && @object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
+              if !@object.variant.product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
                 attach_short_video = Spree::Taxon.find_by(permalink: 'shoutout')
                 @object.variant.product.taxons << attach_short_video
               end
