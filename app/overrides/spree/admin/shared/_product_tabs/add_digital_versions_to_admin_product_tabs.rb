@@ -4,7 +4,9 @@ Deface::Override.new(
   insert_bottom: '[data-hook="admin_product_tabs"]',
   text: <<-HTML
           <li class="<%= 'active' if current == 'Digital Versions' %>">
+<% unless params[:from] == "events" %>
             <%= link_to_with_icon 'cloud', Spree.t(:upload_video, scope: 'digitals'), admin_product_digitals_path(@product), class: 'nav-link' %>
+<%end%>
           </li>
         HTML
 )
