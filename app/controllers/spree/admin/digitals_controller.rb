@@ -16,7 +16,10 @@ module Spree
           if @object.save
             invoke_callbacks(:create, :after)
             video_url = Rails.application.routes.url_helpers.rails_blob_path(@object.attachment, only_path: true)
-            video_info = FFMPEG::Movie.new("https://stagining-celebrity-fans.herokuapp.com/"+video_url)
+            puts "==============================================================================================================================================================="
+            puts "http://stagining-celebrity-fans.herokuapp.com/"+video_url
+            puts "==============================================================================================================================================================="
+            video_info = FFMPEG::Movie.new("http://stagining-celebrity-fans.herokuapp.com/"+video_url)
             video_duration = video_info.duration
             if(video_duration < 10)
               if !@object.variant.product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
