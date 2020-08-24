@@ -15,7 +15,7 @@ module Spree
           @object.attributes = permitted_resource_params
           if @object.save
             invoke_callbacks(:create, :after)
-            video_url = Rails.application.routes.url_helpers.rails_blob_path(@object.attachment)
+            video_url = Rails.application.routes.url_helpers.rails_blob_path(@object.attachment, only_path: true)
             video_info = FFMPEG::Movie.new(video_url)
             video_duration = video_info.duration
             if(video_duration < 10)
