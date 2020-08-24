@@ -1,6 +1,7 @@
 module Spree
   module Admin
     class DigitalsController < ResourceController
+      require 'streamio-ffmpeg'
       belongs_to "spree/product", :find_by => :slug
       before_action :authorize_admin, only: :index
 
@@ -14,7 +15,9 @@ module Spree
           @object.attributes = permitted_resource_params
           if @object.save
             invoke_callbacks(:create, :after)
-            video_duration = ActiveStorage::Analyzer::VideoAnalyzer.new(@object.attachment.blob).metadata[:duration].to_i
+            video_url = Rails.application.routes.url_helpers.rails_blob_path(@object.attachment)
+            video_info = FFMPEG::Movie.new(video_url)
+            video_duration = video_info.duration
             if(video_duration < 10)
               if !@object.variant.product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
                 attach_short_video = Spree::Taxon.find_by(permalink: 'quickshout')
