@@ -34,6 +34,7 @@
         <%#= f.file_field :attachment, accept: "image/png, image/jpeg, image/jpg" %>
         <%# end %>
         <%= hidden_field_tag 'digital[variant_id]', variant.id %>
+        <%= hidden_field_tag 'digital[duration]', 4 %>
         <%= button Spree.t(:upload, scope: "spree_digital"), 'add', 'submit', { :class => "btn btn-primary", id: 'btn_video_upload' } %>
       </div>
       <div class="alert alert-success">
@@ -49,7 +50,8 @@
   $('.alert-success').hide();
   $('.alert-info').hide();
   $('#btn_video_upload').hide();
-    var myVideos = [];
+  $('#digital_duration').val("");
+  var myVideos = [];
 
     window.URL = window.URL || window.webkitURL;
 
@@ -72,6 +74,7 @@
             window.URL.revokeObjectURL(video.src);
             var duration = video.duration;
             myVideos[myVideos.length - 1].duration = duration;
+            $('#digital_duration').val(duration);
             videoDuration();
             updateInfos();
         }

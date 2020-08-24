@@ -15,10 +15,10 @@ module Spree
           @object.attributes = permitted_resource_params
           if @object.save
             invoke_callbacks(:create, :after)
-            video_url = Rails.application.routes.url_helpers.rails_blob_path(@object.attachment, only_path: true)
-            video_info = FFMPEG::Movie.new("https://stagining-celebrity-fans.herokuapp.com/"+video_url)
-            video_duration = video_info.duration
-            if(video_duration < 10)
+            # video_url = Rails.application.routes.url_helpers.rails_blob_path(@object.attachment, only_path: true)
+            # video_info = FFMPEG::Movie.new("https://stagining-celebrity-fans.herokuapp.com/"+video_url)
+            # video_duration = video_info.duration
+            if(params[:digital][:duration].to_i < 10)
               if !@object.variant.product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
                 attach_short_video = Spree::Taxon.find_by(permalink: 'quickshout')
                 @object.variant.product.taxons << attach_short_video
