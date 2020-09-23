@@ -19,14 +19,17 @@ module Spree
             # video_info = FFMPEG::Movie.new("https://stagining-celebrity-fans.herokuapp.com/"+video_url)
             # video_duration = video_info.duration
             if(params[:digital][:duration].to_i < 10)
-              if !@object.variant.product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
+              product = @object.variant.product
+              if !product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
                 attach_short_video = Spree::Taxon.find_by(permalink: 'quickshout')
-                @object.variant.product.taxons << attach_short_video
+                product.update(product_type: 'quickshout')
+                product.taxons << attach_short_video
               end
             else
-              if !@object.variant.product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
+              if !product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
                 attach_short_video = Spree::Taxon.find_by(permalink: 'shoutout')
-                @object.variant.product.taxons << attach_short_video
+                product.update(product_type: 'shoutout')
+                product.taxons << attach_short_video
               end
             end
             flash[:success] = flash_message_for(@object, :successfully_created)
