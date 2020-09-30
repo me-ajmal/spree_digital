@@ -18,8 +18,8 @@ module Spree
             # video_url = Rails.application.routes.url_helpers.rails_blob_path(@object.attachment, only_path: true)
             # video_info = FFMPEG::Movie.new("https://stagining-celebrity-fans.herokuapp.com/"+video_url)
             # video_duration = video_info.duration
+            product = @object.variant.product
             if(params[:digital][:duration].to_i < 10)
-              product = @object.variant.product
               if !product.taxons.present? && !@object.variant.product.taxons.include?(Spree::Taxon.find_by(permalink: 'shortvideo'))
                 attach_short_video = Spree::Taxon.find_by(permalink: 'quickshout')
                 product.update(product_type: 'quickshout')
